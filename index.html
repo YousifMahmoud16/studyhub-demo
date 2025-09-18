@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>StudyHub — Dashboard</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- ملف CSS -->
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="site-brand">
+            <h1>📚 StudyHub</h1>
+            <span class="tagline">منصة مهام ودورات بسيطة</span>
+        </div>
+        <div class="header-actions">
+            <button id="logout" class="btn-ghost hidden">تسجيل خروج</button>
+        </div>
+    </header>
+
+    <main class="page">
+        <!-- AUTH -->
+        <section id="auth-section" class="card auth-card">
+            <h2>تسجيل حساب أو تسجيل دخول</h2>
+            <input id="email" type="email" placeholder="البريد الإلكتروني" />
+            <input id="password" type="password" placeholder="كلمة المرور" />
+            <div class="row gap">
+                <button id="signup" class="btn primary">التسجيل</button>
+                <button id="signin" class="btn">تسجيل الدخول</button>
+            </div>
+            <p id="auth-msg" class="muted"></p>
+        </section>
+
+        <!-- APP / DASHBOARD -->
+        <section id="app-section" class="card hidden">
+            <div class="dashboard">
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stats-courses">0</div>
+                        <div class="stat-label">كورسات</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stats-tasks">0</div>
+                        <div class="stat-label">مهام إجمالية</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stats-done">0</div>
+                        <div class="stat-label">مكتملة</div>
+                    </div>
+                </div>
+
+                <!-- إنشاء كورس & انضمام -->
+                <div class="form-row">
+                    <input id="course-title" type="text" placeholder="اسم الكورس الجديد" />
+                    <button id="add-course" class="btn primary">إضافة كورس</button>
+                </div>
+
+                <div class="form-row small">
+                    <input id="join-course-id" type="text" placeholder="انضم بكود الكورس (Course ID)" />
+                    <button id="join-course-btn" class="btn">انضم للكورس</button>
+                    <span id="join-msg" class="muted"></span>
+                </div>
+
+            </div>
+
+            <h3 class="section-title">كورساتي</h3>
+            <ul id="courses-list" class="list"></ul>
+        </section>
+
+        <!-- TASKS -->
+        <section id="tasks-section" class="card hidden">
+            <div class="tasks-header">
+                <h2 id="course-name">المهام</h2>
+                <div class="task-controls">
+                    <label for="filter">فلتر: </label>
+                    <select id="filter">
+                        <option value="all">الكل</option>
+                        <option value="todo">To Do</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="done">Done</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="task-form form-row-col">
+                <input id="task-title" type="text" placeholder="عنوان المهمة" />
+                <textarea id="task-desc" rows="2" placeholder="وصف الاختياري للمهمة"></textarea>
+                <div class="row gap">
+                    <select id="task-priority">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                    <input id="task-deadline" type="date" />
+                    <button id="add-task" class="btn primary">أضف المهمة</button>
+                </div>
+            </div>
+
+            <h4 class="section-subtitle">قائمة المهام</h4>
+            <ul id="tasks-list" class="list"></ul>
+
+            <div class="row space-top">
+                <button id="back" class="btn">⬅ العودة إلى الكورسات</button>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer muted">
+        Made with ♥ — StudyHub Demo
+    </footer>
+
+    <script type="module" src="app.js"></script>
+</body>
+
+</html>

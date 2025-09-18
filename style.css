@@ -1,0 +1,128 @@
+/* style.css — Calm professional palette (soft teal / gray) */
+
+/* Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+:root{
+  --bg-start: #eef7f9;
+  --bg-end: #f3f6fb;
+  --card-bg: #ffffff;
+  --text: #0f1724;
+  --muted: #667085;
+  --primary: #2aa6a3; /* soft teal */
+  --primary-dark: #1f8f8c;
+  --accent: #5b7cfa;
+  --danger: #ef4444;
+  --radius: 12px;
+  --shadow: 0 8px 24px rgba(16,24,40,0.06);
+}
+
+/* Reset */
+*{ box-sizing: border-box; margin:0; padding:0; font-family: 'Poppins', sans-serif; }
+
+body{
+  background: linear-gradient(180deg,var(--bg-start),var(--bg-end));
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:28px;
+}
+
+/* Header */
+.site-header{
+  width:100%;
+  max-width:1000px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+.site-brand h1{ color:var(--text); font-size:22px; }
+.site-brand .tagline{ color:var(--muted); font-size:13px; margin-left:8px; }
+
+.header-actions .btn-ghost{
+  background:transparent;
+  border:1px solid rgba(15,23,36,0.06);
+  padding:8px 12px;
+  border-radius:10px;
+  cursor:pointer;
+  color:var(--text);
+}
+.hidden{ display:none !important; }
+
+/* Page container */
+.page{ width:100%; max-width:1000px; }
+
+/* Card */
+.card{
+  background:var(--card-bg);
+  padding:18px;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  margin-bottom:18px;
+}
+
+/* Auth */
+.auth-card input{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #eef2f7;
+  margin-bottom:10px;
+  font-size:14px;
+}
+.btn{ padding:10px 14px; border-radius:10px; border:none; cursor:pointer; background:#f3f4f6; font-weight:600; color:var(--text); }
+.btn.primary{ background:linear-gradient(90deg,var(--primary),var(--accent)); color:white; box-shadow: 0 6px 18px rgba(43,118,119,0.08); }
+.btn.primary:hover{ transform:translateY(-2px); }
+.row{ display:flex; align-items:center; }
+.gap{ gap:10px; }
+.small .btn{ padding:8px 10px; }
+
+/* Dashboard */
+.dashboard{ display:flex; flex-direction:column; gap:12px; }
+.stats{ display:flex; gap:12px; }
+.stat-card{ background:linear-gradient(180deg,#ffffff,#fbfdff); padding:12px; border-radius:10px; flex:1; display:flex; flex-direction:column; align-items:flex-start; }
+.stat-value{ font-size:20px; font-weight:700; color:var(--primary-dark); }
+.stat-label{ color:var(--muted); font-size:13px; }
+
+/* Forms */
+.form-row{ display:flex; gap:10px; align-items:center; }
+.form-row small{ font-size:12px; color:var(--muted); }
+
+/* Lists */
+.list{ list-style:none; margin-top:12px; }
+.list li{ display:flex; justify-content:space-between; align-items:center; padding:12px; border-radius:10px; background:#fbfdff; border:1px solid #eef4f8; margin-bottom:8px; }
+.list li .meta{ display:flex; gap:8px; align-items:center; font-size:13px; color:var(--muted); }
+.course-actions button{ margin-left:8px; }
+
+/* Tasks area */
+.tasks-header{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; }
+.task-form input, .task-form textarea, .task-form select{ width:100%; padding:10px; border-radius:8px; border:1px solid #eef2f7; }
+.form-row-col{ display:flex; flex-direction:column; gap:10px; }
+.section-title{ margin:8px 0; color:var(--muted); font-size:14px; }
+.section-subtitle{ margin:10px 0; color:var(--muted); font-size:13px; }
+
+/* Priority badge */
+.badge{ padding:6px 8px; border-radius:8px; font-weight:600; font-size:12px; color:white; }
+.p-low{ background:#94a3b8; }
+.p-medium{ background:#60a5fa; }
+.p-high{ background:#fb923c; }
+
+/* Status badge */
+.s-todo{ color:#ef4444; font-weight:700; }
+.s-inprogress{ color:#b45309; font-weight:700; }
+.s-done{ color:#059669; font-weight:700; }
+
+/* Muted text */
+.muted{ color:var(--muted); font-size:13px; }
+
+/* Footer */
+.footer{ margin-top:20px; color:var(--muted); font-size:13px; text-align:center; }
+
+/* small screens */
+@media (max-width:720px){
+  .form-row{ flex-direction:column; }
+  .stats{ flex-direction:column; }
+}
