@@ -330,8 +330,7 @@ async function loadTasks() {
     let query = supabase
         .from("tasks")
         .select("*")
-        .eq("course_id", currentCourseId)
-        .eq("user_id", currentUser.id)
+        .eq("course_id", currentCourseId) // فقط الكورس، لا حاجة لفلترة المستخدم
         .order("created_at", { ascending: true });
     if (currentFilter !== "all") query = query.eq("status", currentFilter);
 
@@ -516,39 +515,35 @@ if (addNoteBtn) {
         let file_url = null;
 
         if (file) {
-            console.log("Uploading to bucket:", NOTES_BUCKET, "file:", file.name);
-
             const safeName = makeSafeName(file.name);
             const safePath = `${currentCourseId}/${Date.now()}-${safeName}`;
 
             try {
+                // رفع الملف
                 const { error: uploadError } = await supabase.storage
                     .from(NOTES_BUCKET)
-                    .upload(safePath, file);
-                if (uploadError) {
-                    console.error("Upload error:", uploadError);
-                    if (/bucket not found/i.test(String(uploadError.message).toLowerCase()) || /not found/i.test(String(uploadError.message).toLowerCase())) {
-                        alert("فشل رفع الملف: الـ bucket غير موجود. اذهب إلى Supabase → Storage وتأكد من وجود bucket اسمه: '" + NOTES_BUCKET + "' بالضبط.");
-                    } else {
-                        alert("فشل رفع الملف: " + uploadError.message);
-                    }
-                    return;
-                }
+                    .upload(safePath, file, { cacheControl: '3600', upsert: false });
+
+                if (uploadError) throw uploadError;
+
                 file_path = safePath;
-                const { data: urlData } = supabase.storage.from(NOTES_BUCKET).getPublicUrl(safePath);
-                file_url = urlData?.publicUrl || null;
+
+                // **الحصول على رابط عام صحيح**
+                const { data: { publicUrl } } = supabase.storage.from(NOTES_BUCKET).getPublicUrl(safePath);
+                file_url = publicUrl;
+
             } catch (err) {
-                console.error("Upload exception:", err);
-                alert("خطأ أثناء رفع الملف. افتح Console للحصول على تفاصيل.");
+                console.error("Upload error:", err);
+                alert("خطأ أثناء رفع الملف: " + err.message);
                 return;
             }
         }
 
-        // إدراج الملخص في جدول notes
+        // إدخال الملخص في جدول notes
         const { error } = await supabase.from("notes").insert([
             {
                 course_id: currentCourseId,
-                user_id: currentUser.id,
+                user_id: currentUser.id,  // ✅ هذا هو الحل
                 title: title || null,
                 content: content || null,
                 file_path,
@@ -559,16 +554,11 @@ if (addNoteBtn) {
         if (error) {
             console.error("Insert note error:", error);
             alert("خطأ عند إضافة الملخص: " + error.message);
-            if (file_path) {
-                try {
-                    await supabase.storage.from(NOTES_BUCKET).remove([file_path]);
-                } catch (e) {
-                    console.warn("Could not remove file after failed insert:", e);
-                }
-            }
+            if (file_path) await supabase.storage.from(NOTES_BUCKET).remove([file_path]);
             return;
         }
 
+        // تنظيف المدخلات
         if (noteTitleInput) noteTitleInput.value = "";
         if (noteContentInput) noteContentInput.value = "";
         if (noteFileInput) noteFileInput.value = "";
@@ -577,12 +567,14 @@ if (addNoteBtn) {
 }
 
 async function loadNotes() {
-    if (!currentCourseId || !currentUser) return;
+    if (!currentCourseId) return;
+
     const { data, error } = await supabase
         .from("notes")
         .select("*")
         .eq("course_id", currentCourseId)
         .order("created_at", { ascending: false });
+
     notesList.innerHTML = "";
     if (error) {
         console.error("loadNotes error:", error);
@@ -600,6 +592,7 @@ async function loadNotes() {
 
         const topRow = document.createElement("div");
         topRow.className = "flex justify-between items-center";
+
         const left = document.createElement("div");
         left.className = "flex flex-col";
         const titleEl = document.createElement("strong");
@@ -611,14 +604,15 @@ async function loadNotes() {
         left.appendChild(contentEl);
 
         const right = document.createElement("div");
-        right.className = "flex gap";
+        right.className = "flex gap-2";
 
         if (n.file_url) {
+            console.log("Displaying file URL for note:", n.id, n.file_url);
             const fileA = document.createElement("a");
             fileA.href = n.file_url;
             fileA.target = "_blank";
             fileA.rel = "noopener";
-            fileA.className = "btn";
+            fileA.className = "btn bg-gray-200 px-2 py-1 rounded";
             fileA.textContent = "📂 عرض الملف";
             right.appendChild(fileA);
         }
@@ -633,18 +627,13 @@ async function loadNotes() {
             } catch (err) {
                 console.warn("Could not delete file from storage:", err);
             }
-            const { error } = await supabase
-                .from("notes")
-                .delete()
-                .eq("id", n.id)
-                .eq("user_id", currentUser.id);
-            if (error) {
-                console.error("delete note error:", error);
-                alert("خطأ عند حذف الملخص: " + error.message);
-            } else await loadNotes();
+            const { error } = await supabase.from("notes").delete().eq("id", n.id);
+            if (error) console.error("delete note error:", error);
+            else await loadNotes();
         });
 
         right.appendChild(delBtn);
+
         topRow.appendChild(left);
         topRow.appendChild(right);
 
