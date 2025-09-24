@@ -5,11 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>StudyHub — Dashboard</title>
-
-    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
-    <!-- ملف CSS -->
     <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -55,7 +51,6 @@
                     </div>
                 </div>
 
-                <!-- إنشاء كورس & انضمام -->
                 <div class="form-row">
                     <input id="course-title" type="text" placeholder="اسم الكورس الجديد" />
                     <button id="add-course" class="btn primary">إضافة كورس</button>
@@ -66,11 +61,11 @@
                     <button id="join-course-btn" class="btn">انضم للكورس</button>
                     <span id="join-msg" class="muted"></span>
                 </div>
-
             </div>
 
             <h3 class="section-title">كورساتي</h3>
             <ul id="courses-list" class="list"></ul>
+
         </section>
 
         <!-- TASKS -->
@@ -105,6 +100,25 @@
             <h4 class="section-subtitle">قائمة المهام</h4>
             <ul id="tasks-list" class="list"></ul>
 
+            <!-- ملخصات -->
+            <h4 class="section-subtitle space-top">ملخصات الكورس</h4>
+            <div class="note-form form-row-col">
+                <input id="note-title" type="text" placeholder="عنوان الملخص (اختياري)" />
+                <textarea id="note-content" rows="3" placeholder="اكتب ملخص الدرس هنا..."></textarea>
+                <input id="note-file" type="file" accept=".pdf,image/*" />
+                <button id="add-note" class="btn primary">➕ أضف ملخص</button>
+            </div>
+            <ul id="notes-list" class="list"></ul>
+
+            <!-- فيديوهات -->
+            <h4 class="section-subtitle space-top">فيديوهات الكورس</h4>
+            <div class="video-form form-row-col">
+                <input id="video-title" type="text" placeholder="عنوان الفيديو (اختياري)" />
+                <input id="video-file" type="file" accept="video/*" />
+                <button id="add-video" class="btn primary">🎬 أضف فيديو</button>
+            </div>
+            <ul id="videos-list" class="list"></ul>
+
             <div class="row space-top">
                 <button id="back" class="btn">⬅ العودة إلى الكورسات</button>
             </div>
@@ -112,7 +126,7 @@
     </main>
 
     <footer class="footer muted">
-        Made with ♥ — StudyHub Demo
+        Made with ♥ Youssef Mahmoud
     </footer>
 
     <script type="module" src="app.js"></script>
