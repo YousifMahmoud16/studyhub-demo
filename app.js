@@ -716,6 +716,7 @@ if (addVideoBtn) {
 
 async function loadVideos() {
     if (!currentCourseId || !currentUser) return;
+
     const { data, error } = await supabase
         .from("videos")
         .select("*")
@@ -733,6 +734,18 @@ async function loadVideos() {
         return;
     }
 
+    // helper: خمن الـ MIME من امتداد الملف
+    function guessMimeFromPath(path) {
+        if (!path) return "video/mp4";
+        const ext = String(path).split(".").pop().split(/\?|#/)[0].toLowerCase();
+        if (ext === "mp4") return "video/mp4";
+        if (ext === "webm") return "video/webm";
+        if (ext === "ogv" || ext === "ogg") return "video/ogg";
+        if (ext === "mov") return "video/quicktime";
+        // fallback
+        return "video/mp4";
+    }
+
     data.forEach((v) => {
         const li = document.createElement("li");
         li.className = "flex flex-col gap-2 p-3 bg-white rounded shadow";
@@ -743,9 +756,27 @@ async function loadVideos() {
 
         if (v.file_url) {
             const videoEl = document.createElement("video");
-            videoEl.src = v.file_url;
             videoEl.controls = true;
             videoEl.className = "w-full rounded";
+            videoEl.setAttribute("playsinline", ""); // يساعد التشغيل في بعض الأجهزة
+            videoEl.setAttribute("webkit-playsinline", "");
+
+            // حاول الحصول على نوع MIME من file_path أو من رابط الملف
+            const mime = guessMimeFromPath(v.file_path || v.file_url);
+
+            const sourceEl = document.createElement("source");
+            sourceEl.src = v.file_url;
+            sourceEl.type = mime;
+            videoEl.appendChild(sourceEl);
+
+            // عنصر fallback نصي
+            videoEl.appendChild(document.createTextNode("متصفحك لا يدعم تشغيل الفيديو."));
+
+            // خطأ في التحميل/التشغيل → نعرض تحذير في الـ console ونبقي رابط التحميل كحل احتياطي
+            videoEl.addEventListener("error", (ev) => {
+                console.warn("Video playback error for:", v.file_url, ev);
+            });
+
             li.appendChild(videoEl);
 
             // رابط تحميل (اختياري)
@@ -755,6 +786,7 @@ async function loadVideos() {
             dl.rel = "noopener";
             dl.textContent = "⬇ تحميل الفيديو";
             dl.className = "muted";
+            // dl.setAttribute('download',''); // لو حبيت تجبر التحميل
             li.appendChild(dl);
         }
 
@@ -762,17 +794,21 @@ async function loadVideos() {
         delBtn.textContent = "🗑 حذف";
         delBtn.className = "btn bg-red-500 text-white";
         delBtn.addEventListener("click", async () => {
-            // حذف من storage إن وُجد
+            // نحاول حذف الملف من التخزين أولاً (إذا كان موجوداً)
             try {
-                if (v.file_path) await supabase.storage.from(VIDEOS_BUCKET).remove([v.file_path]);
+                if (v.file_path) {
+                    const { error: rmErr } = await supabase.storage.from(VIDEOS_BUCKET).remove([v.file_path]);
+                    if (rmErr) console.warn("Could not remove video file from storage:", rmErr);
+                }
             } catch (err) {
-                console.warn("Could not delete video file from storage:", err);
+                console.warn("Could not delete video file from storage (exception):", err);
             }
-            // حذف من DB
-            const { error } = await supabase.from("videos").delete().eq("id", v.id).eq("user_id", currentUser.id);
-            if (error) {
-                console.error("delete video error:", error);
-                alert("خطأ عند حذف الفيديو: " + error.message);
+
+            // ثم نحذف السجل من DB — دع RLS تتولى التحقق إذا كان مسموحاً
+            const { error: dbErr } = await supabase.from("videos").delete().eq("id", v.id);
+            if (dbErr) {
+                console.error("delete video error:", dbErr);
+                alert("خطأ عند حذف الفيديو: " + dbErr.message);
             } else {
                 await loadVideos();
             }

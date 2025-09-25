@@ -231,8 +231,8 @@ textarea {
   color: #777;
 }
 #videos-list video {
-  width: 100%;        /* يجعل الفيديو بعرض العنصر الأب */
-  max-width: 500px;   /* أقصى عرض للفيديو */
+  width: 90%;        /* يجعل الفيديو بعرض العنصر الأب */
+  max-width: 400px;   /* أقصى عرض للفيديو */
   height: auto;       /* يحافظ على النسبة */
   border-radius: 8px; /* شكل حواف جميل */
 }
