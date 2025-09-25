@@ -236,3 +236,24 @@ textarea {
   height: auto;       /* يحافظ على النسبة */
   border-radius: 8px; /* شكل حواف جميل */
 }
+/* علشان الفيديو ما يطلعش برة الشاشة */
+video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* الحاوية الخاصة بكل فيديو */
+#videos-list li {
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden; /* يمنع أي عناصر تطلع برة */
+}
+
+/* ترتيب الأزرار تحت الفيديو */
+#videos-list li .actions {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap; /* لو الشاشة ضيقة ينزلوا تحت بعض */
+  margin-top: 8px;
+}
