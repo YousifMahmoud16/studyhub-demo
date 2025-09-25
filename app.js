@@ -703,7 +703,6 @@ if (addVideoBtn) {
         if (error) {
             console.error("Insert video error:", error);
             alert("خطأ عند إضافة الفيديو: " + error.message);
-            // حاول حذف الملف من التخزين إن أدخلت شيء بشكل جزئي
             try { await supabase.storage.from(VIDEOS_BUCKET).remove([safePath]); } catch (e) { console.warn("Could not remove video after failed insert:", e); }
             return;
         }
@@ -742,7 +741,6 @@ async function loadVideos() {
         if (ext === "webm") return "video/webm";
         if (ext === "ogv" || ext === "ogg") return "video/ogg";
         if (ext === "mov") return "video/quicktime";
-        // fallback
         return "video/mp4";
     }
 
@@ -752,7 +750,7 @@ async function loadVideos() {
 
         const titleEl = document.createElement("strong");
         titleEl.textContent = v.title || "(فيديو بدون عنوان)";
-        titleEl.className = "break-words"; // يمنع النص الطويل من تمديد الصفحة
+        titleEl.className = "break-words";
         li.appendChild(titleEl);
 
         if (v.file_url) {
@@ -762,7 +760,6 @@ async function loadVideos() {
             videoEl.setAttribute("playsinline", "");
             videoEl.setAttribute("webkit-playsinline", "");
 
-            // حاول الحصول على نوع MIME من file_path أو من رابط الملف
             const mime = guessMimeFromPath(v.file_path || v.file_url);
 
             const sourceEl = document.createElement("source");
@@ -784,3 +781,9 @@ async function loadVideos() {
 }
 
 // نهاية الملف — الآن عند فتح أي كورس سيتم تحميل المهام والملخصات والفيديوهات تلقائياً (openCourse يستدعي loadTasks/loadNotes/loadVideos).
+// li.insertAdjacentHTML("beforeend", `
+// //   <div class="flex justify-center gap-3 mb-2">
+// //     <a href="${v.file_url}" target="_blank" class="btn bg-blue-500 text-white px-3 py-1 rounded">⬇ تحميل</a>
+// //     <button class="btn bg-red-500 text-white px-3 py-1 rounded">🗑 حذف</button>
+// //   </div>
+// // `);            
