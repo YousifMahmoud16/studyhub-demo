@@ -748,17 +748,18 @@ async function loadVideos() {
 
     data.forEach((v) => {
         const li = document.createElement("li");
-        li.className = "flex flex-col gap-2 p-3 bg-white rounded shadow";
+        li.className = "flex flex-col gap-2 p-3 bg-white rounded shadow w-full overflow-hidden";
 
         const titleEl = document.createElement("strong");
         titleEl.textContent = v.title || "(فيديو بدون عنوان)";
+        titleEl.className = "break-words"; // يمنع النص الطويل من تمديد الصفحة
         li.appendChild(titleEl);
 
         if (v.file_url) {
             const videoEl = document.createElement("video");
             videoEl.controls = true;
             videoEl.className = "w-full rounded";
-            videoEl.setAttribute("playsinline", ""); // يساعد التشغيل في بعض الأجهزة
+            videoEl.setAttribute("playsinline", "");
             videoEl.setAttribute("webkit-playsinline", "");
 
             // حاول الحصول على نوع MIME من file_path أو من رابط الملف
@@ -769,52 +770,15 @@ async function loadVideos() {
             sourceEl.type = mime;
             videoEl.appendChild(sourceEl);
 
-            // عنصر fallback نصي
             videoEl.appendChild(document.createTextNode("متصفحك لا يدعم تشغيل الفيديو."));
 
-            // خطأ في التحميل/التشغيل → نعرض تحذير في الـ console ونبقي رابط التحميل كحل احتياطي
             videoEl.addEventListener("error", (ev) => {
                 console.warn("Video playback error for:", v.file_url, ev);
             });
 
             li.appendChild(videoEl);
-
-            // رابط تحميل (اختياري)
-            const dl = document.createElement("a");
-            dl.href = v.file_url;
-            dl.target = "_blank";
-            dl.rel = "noopener";
-            dl.textContent = "⬇ تحميل الفيديو";
-            dl.className = "muted";
-            // dl.setAttribute('download',''); // لو حبيت تجبر التحميل
-            li.appendChild(dl);
         }
 
-        const delBtn = document.createElement("button");
-        delBtn.textContent = "🗑 حذف";
-        delBtn.className = "btn bg-red-500 text-white";
-        delBtn.addEventListener("click", async () => {
-            // نحاول حذف الملف من التخزين أولاً (إذا كان موجوداً)
-            try {
-                if (v.file_path) {
-                    const { error: rmErr } = await supabase.storage.from(VIDEOS_BUCKET).remove([v.file_path]);
-                    if (rmErr) console.warn("Could not remove video file from storage:", rmErr);
-                }
-            } catch (err) {
-                console.warn("Could not delete video file from storage (exception):", err);
-            }
-
-            // ثم نحذف السجل من DB — دع RLS تتولى التحقق إذا كان مسموحاً
-            const { error: dbErr } = await supabase.from("videos").delete().eq("id", v.id);
-            if (dbErr) {
-                console.error("delete video error:", dbErr);
-                alert("خطأ عند حذف الفيديو: " + dbErr.message);
-            } else {
-                await loadVideos();
-            }
-        });
-
-        li.appendChild(delBtn);
         videosList.appendChild(li);
     });
 }
